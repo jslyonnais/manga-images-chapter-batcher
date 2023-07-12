@@ -1,0 +1,25 @@
+# Ignore Python compiled files
+*.pyc
+__pycache__
+
+# Ignore output directory
+/output/
+
+# Ignore input directory
+/source/
+
+# Ignore generated CBZ files
+*.cbz
+
+# Ignore files related to development environment
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore info files
+ComicInfo.xml
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
