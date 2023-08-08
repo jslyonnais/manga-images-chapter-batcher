@@ -43,7 +43,8 @@ def main(parent_directory, new_directory, verbose=False):
     for root, dirs, files in os.walk(parent_directory):
         if verbose:
             print(f"\U0001F4C1 Working in directory: {root}")  # 📁
-        sorted_files = sorted(file for file in files if file.endswith(".jpg"))
+        accepted_extensions = (".jpg", ".jpeg", ".png")
+        sorted_files = sorted(file for file in files if file.lower().endswith(accepted_extensions))
         for filename in sorted_files:
             # Construct the full file paths
             old_filepath = os.path.join(root, filename)
