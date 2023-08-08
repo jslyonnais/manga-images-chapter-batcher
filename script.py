@@ -35,20 +35,31 @@ def create_metadata():
 
 def main(parent_directory, new_directory, verbose=False):
     increment = 1  # Start the numbering from 1
-    # Create the new directory if it doesn't exist
-    if not os.path.exists(new_directory):
-        os.makedirs(new_directory)
+    # Create the metadata file first to know the title
+    title = create_metadata()
+
+    # Create directories
+    title_directory = os.path.join(new_directory, title)  # output/title/
+    image_directory = os.path.join(title_directory, "images")  # output/title/images
+    cbz_directory = os.path.join(title_directory, "cbz")  # output/title/cbz
+
+    # Create the directories if they don't exist
+    for directory in [title_directory, image_directory, cbz_directory]:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
     # Walk through all directories and files in the parent directory
     for root, dirs, files in os.walk(parent_directory):
         if verbose:
             print(f"\U0001F4C1 Working in directory: {root}")  # 📁
+
         accepted_extensions = (".jpg", ".jpeg", ".png")
         sorted_files = sorted(file for file in files if file.lower().endswith(accepted_extensions))
+
         for filename in sorted_files:
             # Construct the full file paths
             old_filepath = os.path.join(root, filename)
-            new_filepath = os.path.join(new_directory, increment_filename(increment))
+            new_filepath = os.path.join(image_directory, increment_filename(increment))
 
             # Copy the file to the new directory with the incremented filename
             shutil.copy2(old_filepath, new_filepath)
@@ -62,21 +73,19 @@ def main(parent_directory, new_directory, verbose=False):
             # Increment the counter
             increment += 1
 
-    # Create the metadata file
-    title = create_metadata()
-
     # Create a CBZ file
     print("\U0001F4C6 Creating CBZ file...")  # 📆
-    with zipfile.ZipFile(f"{title}.cbz", "w") as comic_zip:
+    cbz_filename = os.path.join(cbz_directory, f"{title}.cbz")
+    with zipfile.ZipFile(cbz_filename, "w") as comic_zip:
         # Add all files in the output directory to the CBZ file
-        for foldername, subfolders, filenames in os.walk(new_directory):
+        for foldername, subfolders, filenames in os.walk(image_directory):
             for filename in filenames:
                 comic_zip.write(os.path.join(foldername, filename), filename)
         # Add the metadata file to the CBZ file
         comic_zip.write("ComicInfo.xml")
 
     print("\U0001F4C6 CBZ file created!")  # 📆
-
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some integers.")
